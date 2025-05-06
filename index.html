@@ -23,6 +23,12 @@
       renderTable(data);
     }
 
+    async function verifyEntry(id) {
+      const { error } = await supabase.from('repairs').update({ verified: true }).eq('id', id);
+      if (error) return alert('Verification failed');
+      fetchData();
+    }
+
     function filterBranch(branch) {
       currentBranch = branch;
       document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
@@ -46,7 +52,13 @@
           return;
         }
 
-        const rowClass = age >= 7 ? 'bg-yellow-100' : '';
+        let rowClass = '';
+        if (item.verified) {
+          rowClass = 'bg-green-100';
+        } else if (age >= 7) {
+          rowClass = 'bg-yellow-100';
+        }
+
         tbody.innerHTML += `
           <tr class="${rowClass}">
             <td class="p-2">${item.date}</td>
@@ -55,6 +67,7 @@
             <td class="p-2">${item.equipment}</td>
             <td class="p-2">${item.serial}</td>
             <td class="p-2">${item.branch}</td>
+            <td class="p-2">${item.verified ? '✔️ Verified' : `<input type='checkbox' onchange='verifyEntry(${item.id})' />`}</td>
           </tr>
         `;
       });
@@ -62,6 +75,7 @@
 
     window.addEventListener('load', fetchData);
     window.filterBranch = filterBranch;
+    window.verifyEntry = verifyEntry;
   </script>
 </head>
 <body class="bg-gray-100 min-h-screen p-6">
@@ -93,6 +107,7 @@
             <th class="p-2 text-left">Equipment</th>
             <th class="p-2 text-left">S/N</th>
             <th class="p-2 text-left">Branch</th>
+            <th class="p-2 text-left">Verified</th>
           </tr>
         </thead>
         <tbody id="repairTable"></tbody>
@@ -118,3 +133,4 @@
   </style>
 </body>
 </html>
+
