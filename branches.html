@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Branch View - Repair Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+
+    const SUPABASE_URL = 'https://juxgqwazevebtefwriws.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1eGdxd2F6ZXZlYnRlZndyaXdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1NDExOTIsImV4cCI6MjA2MjExNzE5Mn0.Qwdnb_wQRfYKAYRHBl2IYsnZLaHMS_FdbX3gPXFFXS0';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentBranch = 'All';
+
+    async function fetchData() {
+      const { data, error } = await supabase
+        .from('repairs')
+        .select('*')
+        .order('date', { ascending: false });
+      if (error) return console.error(error);
+      renderTable(data);
+    }
+
+    function filterBranch(branch) {
+      currentBranch = branch;
+      document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
+      const active = document.getElementById('pill-' + branch);
+      if (active) active.classList.add('active');
+      fetchData();
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('repairTable');
+      const search = document.getElementById('search').value.toLowerCase();
+      tbody.innerHTML = '';
+
+      const now = new Date();
+      data.forEach(item => {
+        const age = (now - new Date(item.date)) / (1000 * 60 * 60 * 24);
+        if (age >= 14) return;
+
+        if ((currentBranch !== 'All' && item.branch !== currentBranch) ||
+            !(item.client.toLowerCase().includes(search) || item.serial.toLowerCase().includes(search))) {
+          return;
+        }
+
+        const rowClass = age >= 7 ? 'bg-gray-100' : '';
+        tbody.innerHTML += `
+          <tr class="${rowClass}">
+            <td class="p-2">${item.date}</td>
+            <td class="p-2">${item.complaint}</td>
+            <td class="p-2">${item.client}</td>
+            <td class="p-2">${item.equipment}</td>
+            <td class="p-2">${item.serial}</td>
+            <td class="p-2">${item.branch}</td>
+          </tr>
+        `;
+      });
+    }
+
+    window.addEventListener('load', fetchData);
+    window.filterBranch = filterBranch;
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">Branch View - Repair Tracker</h1>
+
+    <div class="flex flex-wrap items-center gap-4 mb-4" id="filterContainer">
+      <button onclick="filterBranch('All')" class="filter-pill" id="pill-All">All</button>
+      <button onclick="filterBranch('Calgary')" class="filter-pill" id="pill-Calgary">Calgary</button>
+      <button onclick="filterBranch('Edmonton')" class="filter-pill" id="pill-Edmonton">Edmonton</button>
+      <button onclick="filterBranch('Halifax')" class="filter-pill" id="pill-Halifax">Halifax</button>
+      <button onclick="filterBranch('London')" class="filter-pill" id="pill-London">London</button>
+      <button onclick="filterBranch('Montreal')" class="filter-pill" id="pill-Montreal">Montreal</button>
+      <button onclick="filterBranch('Ottawa')" class="filter-pill" id="pill-Ottawa">Ottawa</button>
+      <button onclick="filterBranch('Quebec')" class="filter-pill" id="pill-Quebec">Quebec</button>
+      <button onclick="filterBranch('Toronto')" class="filter-pill" id="pill-Toronto">Toronto</button>
+      <button onclick="filterBranch('Vancouver')" class="filter-pill" id="pill-Vancouver">Vancouver</button>
+      <button onclick="filterBranch('Winnipeg')" class="filter-pill" id="pill-Winnipeg">Winnipeg</button>
+      <input id="search" oninput="fetchData()" type="text" placeholder="Search Client or S/N..." class="ml-auto p-2 border rounded" />
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white rounded shadow">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="p-2 text-left">Date</th>
+            <th class="p-2 text-left">Complaint #</th>
+            <th class="p-2 text-left">Client #</th>
+            <th class="p-2 text-left">Equipment</th>
+            <th class="p-2 text-left">S/N</th>
+            <th class="p-2 text-left">Branch</th>
+          </tr>
+        </thead>
+        <tbody id="repairTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <style>
+    .filter-pill {
+      background-color: #e5e7eb;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .filter-pill.active {
+      background-color: #3b82f6;
+      color: white;
+    }
+    .filter-pill:hover {
+      background: #d1d5db;
+    }
+  </style>
+</body>
+</html>
