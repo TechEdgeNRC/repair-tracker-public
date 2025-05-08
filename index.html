@@ -23,17 +23,17 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-4 mb-4" id="filterContainer">
-        <button onclick="filterBranch('All')" class="filter-pill" id="pill-All">All</button>
-        <button onclick="filterBranch('Calgary')" class="filter-pill" id="pill-Calgary">Calgary</button>
-        <button onclick="filterBranch('Edmonton')" class="filter-pill" id="pill-Edmonton">Edmonton</button>
-        <button onclick="filterBranch('Halifax')" class="filter-pill" id="pill-Halifax">Halifax</button>
-        <button onclick="filterBranch('London')" class="filter-pill" id="pill-London">London</button>
-        <button onclick="filterBranch('Montreal')" class="filter-pill" id="pill-Montreal">Montreal</button>
-        <button onclick="filterBranch('Ottawa')" class="filter-pill" id="pill-Ottawa">Ottawa</button>
-        <button onclick="filterBranch('Quebec')" class="filter-pill" id="pill-Quebec">Quebec</button>
-        <button onclick="filterBranch('Toronto')" class="filter-pill" id="pill-Toronto">Toronto</button>
-        <button onclick="filterBranch('Vancouver')" class="filter-pill" id="pill-Vancouver">Vancouver</button>
-        <button onclick="filterBranch('Winnipeg')" class="filter-pill" id="pill-Winnipeg">Winnipeg</button>
+        <button class="filter-pill" id="pill-All">All</button>
+        <button class="filter-pill" id="pill-Calgary">Calgary</button>
+        <button class="filter-pill" id="pill-Edmonton">Edmonton</button>
+        <button class="filter-pill" id="pill-Halifax">Halifax</button>
+        <button class="filter-pill" id="pill-London">London</button>
+        <button class="filter-pill" id="pill-Montreal">Montreal</button>
+        <button class="filter-pill" id="pill-Ottawa">Ottawa</button>
+        <button class="filter-pill" id="pill-Quebec">Quebec</button>
+        <button class="filter-pill" id="pill-Toronto">Toronto</button>
+        <button class="filter-pill" id="pill-Vancouver">Vancouver</button>
+        <button class="filter-pill" id="pill-Winnipeg">Winnipeg</button>
         <input id="search" oninput="fetchData()" type="text" placeholder="Search Client or S/N..." class="ml-auto p-2 border rounded" />
       </div>
 
@@ -59,8 +59,8 @@
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
-    const SUPABASE_URL = 'https://juxgqwazevebtefwriws.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1eGdxd2F6ZXZlYnRlZndyaXdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1NDExOTIsImV4cCI6MjA2MjExNzE5Mn0.Qwdnb_wQRfYKAYRHBl2IYsnZLaHMS_FdbX3gPXFFXS0';
+    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+    const SUPABASE_KEY = 'YOUR_ANON_PUBLIC_KEY';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentBranch = 'All';
@@ -139,7 +139,14 @@
 
     window.handleLogout = function () {
       location.reload();
-    }
+    };
+
+    document.querySelectorAll('.filter-pill').forEach(button => {
+      button.addEventListener('click', () => {
+        const branch = button.textContent.trim();
+        filterBranch(branch);
+      });
+    });
 
     window.filterBranch = filterBranch;
     window.verifyEntry = verifyEntry;
