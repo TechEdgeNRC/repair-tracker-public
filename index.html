@@ -5,6 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Branch View - Repair Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div id="loginScreen" class="max-w-md mx-auto bg-white shadow rounded p-6 mt-24">
+    <h2 class="text-xl font-bold mb-4">Branch Login</h2>
+    <input id="loginUser" type="text" placeholder="Username" class="input w-full mb-3">
+    <input id="loginPass" type="password" placeholder="Password" class="input w-full mb-3">
+    <button onclick="handleLogin()" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Login</button>
+    <p id="loginError" class="text-red-500 text-sm mt-2 hidden">Invalid username or password</p>
+  </div>
+
+  <div id="mainApp" class="hidden">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Branch View - Repair Tracker</h1>
+        <button onclick="handleLogout()" class="text-sm underline text-red-600">Logout</button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4" id="filterContainer">
+        <button onclick="filterBranch('All')" class="filter-pill" id="pill-All">All</button>
+        <button onclick="filterBranch('Calgary')" class="filter-pill" id="pill-Calgary">Calgary</button>
+        <button onclick="filterBranch('Edmonton')" class="filter-pill" id="pill-Edmonton">Edmonton</button>
+        <button onclick="filterBranch('Halifax')" class="filter-pill" id="pill-Halifax">Halifax</button>
+        <button onclick="filterBranch('London')" class="filter-pill" id="pill-London">London</button>
+        <button onclick="filterBranch('Montreal')" class="filter-pill" id="pill-Montreal">Montreal</button>
+        <button onclick="filterBranch('Ottawa')" class="filter-pill" id="pill-Ottawa">Ottawa</button>
+        <button onclick="filterBranch('Quebec')" class="filter-pill" id="pill-Quebec">Quebec</button>
+        <button onclick="filterBranch('Toronto')" class="filter-pill" id="pill-Toronto">Toronto</button>
+        <button onclick="filterBranch('Vancouver')" class="filter-pill" id="pill-Vancouver">Vancouver</button>
+        <button onclick="filterBranch('Winnipeg')" class="filter-pill" id="pill-Winnipeg">Winnipeg</button>
+        <input id="search" oninput="fetchData()" type="text" placeholder="Search Client or S/N..." class="ml-auto p-2 border rounded" />
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded shadow">
+          <thead class="bg-gray-200">
+            <tr>
+              <th class="p-2 text-left">Date</th>
+              <th class="p-2 text-left">Complaint #</th>
+              <th class="p-2 text-left">Client #</th>
+              <th class="p-2 text-left">Equipment</th>
+              <th class="p-2 text-left">S/N</th>
+              <th class="p-2 text-left">Branch</th>
+              <th class="p-2 text-left">Verified</th>
+            </tr>
+          </thead>
+          <tbody id="repairTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
@@ -73,47 +124,23 @@
       });
     }
 
-    window.addEventListener('load', fetchData);
-    window.filterBranch = filterBranch;
-    window.verifyEntry = verifyEntry;
+    window.handleLogin = function () {
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+      const error = document.getElementById('loginError');
+      if (user === 'BRANCHPatterson' && pass === 'Q5#zK9eLp$X7') {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').classList.remove('hidden');
+        fetchData();
+      } else {
+        error.classList.remove('hidden');
+      }
+    }
+
+    window.handleLogout = function () {
+      location.reload();
+    }
   </script>
-</head>
-<body class="bg-gray-100 min-h-screen p-6">
-  <div class="max-w-6xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6">Branch View - Repair Tracker</h1>
-
-    <div class="flex flex-wrap items-center gap-4 mb-4" id="filterContainer">
-      <button onclick="filterBranch('All')" class="filter-pill" id="pill-All">All</button>
-      <button onclick="filterBranch('Calgary')" class="filter-pill" id="pill-Calgary">Calgary</button>
-      <button onclick="filterBranch('Edmonton')" class="filter-pill" id="pill-Edmonton">Edmonton</button>
-      <button onclick="filterBranch('Halifax')" class="filter-pill" id="pill-Halifax">Halifax</button>
-      <button onclick="filterBranch('London')" class="filter-pill" id="pill-London">London</button>
-      <button onclick="filterBranch('Montreal')" class="filter-pill" id="pill-Montreal">Montreal</button>
-      <button onclick="filterBranch('Ottawa')" class="filter-pill" id="pill-Ottawa">Ottawa</button>
-      <button onclick="filterBranch('Quebec')" class="filter-pill" id="pill-Quebec">Quebec</button>
-      <button onclick="filterBranch('Toronto')" class="filter-pill" id="pill-Toronto">Toronto</button>
-      <button onclick="filterBranch('Vancouver')" class="filter-pill" id="pill-Vancouver">Vancouver</button>
-      <button onclick="filterBranch('Winnipeg')" class="filter-pill" id="pill-Winnipeg">Winnipeg</button>
-      <input id="search" oninput="fetchData()" type="text" placeholder="Search Client or S/N..." class="ml-auto p-2 border rounded" />
-    </div>
-
-    <div class="overflow-x-auto">
-      <table class="min-w-full bg-white rounded shadow">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="p-2 text-left">Date</th>
-            <th class="p-2 text-left">Complaint #</th>
-            <th class="p-2 text-left">Client #</th>
-            <th class="p-2 text-left">Equipment</th>
-            <th class="p-2 text-left">S/N</th>
-            <th class="p-2 text-left">Branch</th>
-            <th class="p-2 text-left">Verified</th>
-          </tr>
-        </thead>
-        <tbody id="repairTable"></tbody>
-      </table>
-    </div>
-  </div>
 
   <style>
     .filter-pill {
@@ -130,7 +157,11 @@
     .filter-pill:hover {
       background: #d1d5db;
     }
+    .input {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+    }
   </style>
 </body>
 </html>
-
